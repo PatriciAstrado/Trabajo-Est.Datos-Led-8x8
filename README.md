@@ -2,7 +2,7 @@
 
 Integrantes:
   - Patricio Vejar
-  - 
+  - Basthian Valenzuela
   - 
   - 
   -  
