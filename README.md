@@ -4,5 +4,5 @@ Integrantes:
   - Patricio Vejar
   - Basthian Valenzuela
   - Rafael Bugueño
-  - 
+  - Flavio cortes
   -  
