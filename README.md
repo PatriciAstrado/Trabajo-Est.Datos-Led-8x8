@@ -5,7 +5,7 @@ Integrantes:
   - Basthian Valenzuela
   - Rafael Bugueño
   - Flavio cortes
-  -  
+  - Sofía Alvarez
 
 
 Link Doc Google Informe:
