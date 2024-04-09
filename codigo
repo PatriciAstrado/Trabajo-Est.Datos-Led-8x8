@@ -1,1 +1,39 @@
+// Variables globales
+señal_recibida = FALSE
 
+pines_positivos[8]
+pines_negativos[8]
+
+display(pin_positivo,pin_negativo)
+	Activar()
+	Encender()
+	Esperar()
+	Desactivar()
+
+manejo_señal(señal)
+	señal_recibida = señal
+
+main()
+	estado = GPIO_conectar_gpio()
+	if (estado == ERROR)
+		END
+
+	for frame_actual en lista_frames
+		GPIO_verificar_señal(manejo_señal)
+		while (¡señal_recibida)
+			for row en filas
+				for col en columnas
+					if (frame_actual[row][col] == 1) // Encendido
+						display(pin_positivo[row],pin_negativo[col])
+			
+
+	GPIO_desconectar_gpio()
+	END
+
+	
+ 
+(codigos_pos, codigos_neg, i, j)
+	cable_pos = codigos_pos[]
+
+	// Activar
+	
