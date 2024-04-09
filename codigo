@@ -6,7 +6,7 @@
 // Variables globales
 volatile sig_atomic_c signal = 0;
 
-void display() {
+void encender_led() {
 	// Activar
 
 	// Encender
@@ -14,6 +14,17 @@ void display() {
 	// Esperar
 
 	// Desactivar()
+}
+
+void apagar_display(){
+	#modulo para asegurarse de apagar todos los led antes de ejecutar gpioTerminate
+	for(int i=0,i<8,i++){
+		gpioWrite(pines_positivos[i],PI_LOW); #pines positivos a negativo
+		gpioSetMode(pines_positivos[i],PI_INPUT);
+		gpioWrite(pines_negativos[i],PI_HIGH); #pines negativos a positivo
+		gpioSetMode(pines_positivos[i],PI_INPUT);
+	}
+	gpioTerminate();
 }
 
 void signal_handler(signal) { // LISTA 
@@ -47,21 +58,16 @@ main() {
 		
 	}
 }
-	
-
-
-
-	for frame_actual en lista_frames
-		
+	for (int=0;i<frames_totales;i++){
 		GPIO_verificar_señal(manejo_señal)
 		while (¡señal_recibida)
-			for row en filas
-				for col en columnas
-					if (frame_actual[row][col] == 1) // Encendido
-						display(pin_positivo[row],pin_negativo[col])
+		for row en filas
+			for col en columnas
+				if (frame_actual[row][col] == 1) // Encendido
+					encender_led(pines_positivos[row],pines_negativos[col])
 			
 
-	GPIO_desconectar_gpio()
+	apagar_display()
 	END
 
 	
