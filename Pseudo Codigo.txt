@@ -1,7 +1,10 @@
 // Variables globales
 señal_recibida = FALSE
 
-display()
+pines_positivos[8]
+pines_negativos[8]
+
+display(pin_positivo,pin_negativo)
 	Activar()
 	Encender()
 	Esperar()
@@ -21,7 +24,7 @@ main()
 			for row en filas
 				for col en columnas
 					if (frame_actual[row][col] == 1) // Encendido
-						display()
+						display(pin_positivo[row],pin_negativo[col])
 			
 
 	GPIO_desconectar_gpio()
