@@ -1,11 +1,24 @@
-// signal == señal
-// handler == manejador
-// received == recibido
-
+#define FRAMES 1
+#define TIME 0.01
 
 // Variables globales
 volatile sig_atomic_c signal = 0;
-const t = 1 //variable de tiempo para cambiar facilmente
+
+// Pines
+int pines_positivos[8]={26,19,13,6,5,11,9,10};
+int pines_negativos[8]={21,20,16,12,7,8,25,24};
+
+// Arreglo que contendrá el frame actual
+int frame_actual[8][8]={{0,0,0,0,0,0,0,0},
+		        {0,0,0,0,0,0,0,0},
+		        {0,0,0,0,0,0,0,0},
+		        {0,0,0,1,1,0,0,0},
+		        {0,0,0,1,1,0,0,0},
+		        {0,0,0,0,0,0,0,0},
+		        {0,0,0,0,0,0,0,0},
+	  	        {0,0,0,0,0,0,0,0}};
+
+// Módulos
 void encender_y_apagar_led(int signal_plus, int signal_minus) {  //recive directamente los pines, llamar usando los arrays, ejecuta un encendido y apagado de leds
 	//pato: hecho apartir del modelo while del profe
 
@@ -15,21 +28,17 @@ void encender_y_apagar_led(int signal_plus, int signal_minus) {  //recive direct
 	//Activar Señales	
 		gpioWrite(signal_plus, 1);  //levantamos señales
 		gpioWrite(signal_minus,0); 
-	
 	// Esperar
-		 time_sleep(t);
+		 time_sleep(TIME);
 	// Desactivar Señales
 		gpioWrite(signal_plus,0);
 		gpioWrite(signal_minus,1);
-	// Esperar
-		 time_sleep(t);
-	// Encender
+	// Desactivar
 		gpioSetMode(signal_minus,0); //que ejecute la señales
 		gpioSetMode(signal_plus,0);
 }
 
-
-void apagar_display(){
+void apagar_display(){ 
 	//modulo para asegurarse de apagar todos los led antes de ejecutar gpioTerminate
 	for(int i=0,i<8,i++){
 		gpioWrite(pines_positivos[i],PI_LOW); //pines positivos a negativo
@@ -40,45 +49,55 @@ void apagar_display(){
 	gpioTerminate();
 }
 
-void signal_handler(signal) { // LISTA 
+void signal_handler(signal) { // FINALIZADA //
 	signal_received = signal;
 }
-	
-int pines_positivos[8]={26,19,13,6,5,11,9,10}
-int pines_negativos[8]={21,20,16,12,7,8,25,24}
 
-int frame_actual=0
-int cantidad_frames=2
+main() { // MAIN DE PRUEBA: MANEJA UN SOLO FRAME (frame_actual) --- BORRAR POSTERIORMENTE
+	int row, col;
+	if(gpioInitialize() == PI_INIT_FAILED){
+		printf("Error al inicializar el gpio\n");
+		return 1;
+	}
 
-int frame1[8][8]={{0,0,0,0,0,0,0,0},
-		  {0,0,0,0,0,0,0,0},
-		  {0,0,0,0,0,0,0,0},
-		  {0,0,0,1,1,0,0,0},
-		  {0,0,0,1,1,0,0,0},
-		  {0,0,0,0,0,0,0,0},
-		  {0,0,0,0,0,0,0,0},
-	  	  {0,0,0,0,0,0,0,0}}
-main() {
+	printf("presione Ctrl+c para terminar el programa");
+	for (int row = 0; row < 8; row++) {
+		for (int col = 0; col < 8; col++) {
+			if (frame_actual[row][col] == 1) {
+				encender_y_apagar_led(pines_positivos[row], pines_negativos[col]);
+			}
+		}
+	}
+
+	// Fin
+	apagar_display()
+	return 1;
+
+}
+/*
+main() { // MAIN PRINCIPAL
 	int row,col;
-	if(gpioInitialize()== PI_INIT_FAILED){
+	if(gpioInitialize()==PI_INIT_FAILED){
 		printf("Error al inicializar el gpio\n");
 		return(1);
 	}
 
 	// Manejo señal
-	signal(SIGINT, signal_handler);
 	printf("presione Ctrl+c para terminar el programa");
-
-}
-	for (int=0;i<frames_totales;i++){
-		GPIO_verificar_senal(manejo_senal)
-		while (¡signal_received)
-		for (row=0; row<8;row++){
-			for (col=0; col<8; col++;){
-				if (frame_actual[row][col] == 1) // Encendido
-					encender_y_apagar_led(pines_positivos[row],pines_negativos[col])
-			
+	for (int=0;i<FRAMES;i++){
+		signal(SIGINT, signal_handler);	
+		// conseguir_frame_actual(FILE, frame_actual); // PSEUDO
+		while (!signal_received) {
+			for (int row=0; row<8;row++){
+				for (int col=0; col<8; col++;){
+					if (frame_actual[row][col] == 1) { // Encendido
+						encender_y_apagar_led(pines_positivos[row],pines_negativos[col]);
+      					}
+	   			}
+       			}
+		}
 
 	apagar_display()
-	END
-	
+	return 1;
+}
+*/
