@@ -73,7 +73,7 @@ main() {
 	}
 }
 	for (int=0;i<frames_totales;i++){
-		GPIO_verificar_señal(manejo_señal)
+		GPIO_verificar_senal(manejo_senal)
 		while (¡signal_received)
 		for (row=0; row<8;row++){
 			for (col=0; col<8; col++;){
