@@ -67,10 +67,8 @@ main() {
 
 	// Manejo señal
 	signal(SIGINT, signal_handler);
+	printf("presione Ctrl+c para terminar el programa");
 
-	if (!signal_received) { // DENTRO DEL BUCLE DE LOS FRAMES
-		
-	}
 }
 	for (int=0;i<frames_totales;i++){
 		GPIO_verificar_senal(manejo_senal)
