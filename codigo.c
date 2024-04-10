@@ -5,23 +5,36 @@
 
 // Variables globales
 volatile sig_atomic_c signal = 0;
+const t = 1 //variable de tiempo para cambiar facilmente
+void encender_y_apagar_led(int signal_plus, int signal_minus) {  //recive directamente los pines, llamar usando los arrays, ejecuta un encendido y apagado de leds
+	//pato: hecho apartir del modelo while del profe
 
-void encender_led() {
-	// Activar
-
-	// Encender
-
+	// Activar  |  1=pi_high  0=pi_low
+		gpioSetMode(signal_minus,1);   //encendemos input para señales mas-menos
+		gpioSetMode(signal_plus,1);
+	//Activar Señales	
+		gpioWrite(signal_plus, 1);  //levantamos señales
+		gpioWrite(signal_minus,0); 
+	
 	// Esperar
-
-	// Desactivar()
+		 time_sleep(t);
+	// Desactivar Señales
+		gpioWrite(signal_plus,0);
+		gpioWrite(signal_minus,1);
+	// Esperar
+		 time_sleep(t);
+	// Encender
+		gpioSetMode(signal_minus,0); //que ejecute la señales
+		gpioSetMode(signal_plus,0);
 }
 
+
 void apagar_display(){
-	#modulo para asegurarse de apagar todos los led antes de ejecutar gpioTerminate
+	//modulo para asegurarse de apagar todos los led antes de ejecutar gpioTerminate
 	for(int i=0,i<8,i++){
-		gpioWrite(pines_positivos[i],PI_LOW); #pines positivos a negativo
+		gpioWrite(pines_positivos[i],PI_LOW); //pines positivos a negativo
 		gpioSetMode(pines_positivos[i],PI_INPUT);
-		gpioWrite(pines_negativos[i],PI_HIGH); #pines negativos a positivo
+		gpioWrite(pines_negativos[i],PI_HIGH); //pines negativos a positivo
 		gpioSetMode(pines_negativos[i],PI_INPUT);
 	}
 	gpioTerminate();
@@ -65,7 +78,7 @@ main() {
 		for (row=0; row<8;row++){
 			for (col=0; col<8; col++;){
 				if (frame_actual[row][col] == 1) // Encendido
-					encender_led(pines_positivos[row],pines_negativos[col])
+					encender_y_apagar_led(pines_positivos[row],pines_negativos[col])
 			
 
 	apagar_display()
