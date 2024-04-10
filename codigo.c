@@ -22,7 +22,7 @@ void apagar_display(){
 		gpioWrite(pines_positivos[i],PI_LOW); #pines positivos a negativo
 		gpioSetMode(pines_positivos[i],PI_INPUT);
 		gpioWrite(pines_negativos[i],PI_HIGH); #pines negativos a positivo
-		gpioSetMode(pines_positivos[i],PI_INPUT);
+		gpioSetMode(pines_negativos[i],PI_INPUT);
 	}
 	gpioTerminate();
 }
