@@ -46,6 +46,7 @@ int frame1[8][8]={{0,0,0,0,0,0,0,0},
 		  {0,0,0,0,0,0,0,0},
 	  	  {0,0,0,0,0,0,0,0}}
 main() {
+	int row,col;
 	if(gpioInitialize()== PI_INIT_FAILED){
 		printf("Error al inicializar el gpio\n");
 		return(1);
@@ -60,9 +61,9 @@ main() {
 }
 	for (int=0;i<frames_totales;i++){
 		GPIO_verificar_señal(manejo_señal)
-		while (¡señal_recibida)
-		for row en filas
-			for col en columnas
+		while (¡signal_received)
+		for (row=0; row<8;row++){
+			for (col=0; col<8; col++;){
 				if (frame_actual[row][col] == 1) // Encendido
 					encender_led(pines_positivos[row],pines_negativos[col])
 			
