@@ -83,11 +83,4 @@ main() {
 
 	apagar_display()
 	END
-
-	
- 
-(codigos_pos, codigos_neg, i, j)
-	cable_pos = codigos_pos[]
-
-	// Activar
 	
