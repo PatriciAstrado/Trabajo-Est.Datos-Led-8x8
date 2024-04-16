@@ -81,10 +81,24 @@ void apagar_display(){
 void signal_handler(signal) { // FINALIZADA //
 	signal_received = signal;
 }
-
+/*(FLAVIO)Void Documento_de_Leds(){
+	FILE*ledsfile=fopen("Leds.txt","a");
+ 	if(ledsfile==NULL){
+  		printf("No se puedo abrir el archivo");
+    	}
+     	for(row=0;row<8;row++){
+      		for(col=0;col<8;col++){
+			dprintf(ledsfile,"%d",frame_actual[row][col];
+   		}
+     		fprintf(ledsfile,"\N\n);
+       }
+       fclose(ledsfile);
+  }     */
 main() { // MAIN DE PRUEBA: MANEJA UN SOLO FRAME (frame_actual) --- BORRAR POSTERIORMENTE
 	int row, col;
-	
+	/*(FLAVIO)FILE*ledsfile;
+ 	ledsfile=fopen("Leds.txt","w");
+  	fclose(ledsfile);*/
 	if(gpioInitialize() == PI_INIT_FAILED){
 		printf("Error al inicializar el gpio\n");
 		return 1;
