@@ -9,14 +9,14 @@ const int pines_positivos[8]={26,19,13,6,5,11,9,10};
 const int pines_negativos[8]={21,20,16,12,7,8,25,24};
 
 // Arreglo que contendrá el frame actual
-int frame_actual[8][8]={{0,0,0,0,0,0,0,0},
+int frame_actual[2][8][8]={{{0,0,0,0,0,0,0,0},
 		        {0,0,0,0,0,0,0,0},
 		        {0,0,0,0,0,0,0,0},
 		        {0,0,0,1,1,0,0,0},
 		        {0,0,0,1,1,0,0,0},
 		        {0,0,0,0,0,0,0,0},
 		        {0,0,0,0,0,0,0,0},
-	  	        {0,0,0,0,0,0,0,0}};
+	  	        {0,0,0,0,0,0,0,0}}};
 
 // Módulos
 void todos_led_off(){ //-pv
@@ -95,32 +95,47 @@ void signal_handler(signal) { // FINALIZADA //
        fclose(ledsfile);
   }     */
 main() { // MAIN DE PRUEBA: MANEJA UN SOLO FRAME (frame_actual) --- BORRAR POSTERIORMENTE
-	int row, col;
-	/*(FLAVIO)FILE*ledsfile;
- 	ledsfile=fopen("Leds.txt","w");
-  	fclose(ledsfile);*/
+	int frame, row, col;
 	if(gpioInitialize() == PI_INIT_FAILED){
 		printf("Error al inicializar el gpio\n");
 		return 1;
 	}
 	todos_led_off();//lo llamamos al inicio para asegurar que todo este reciviendo señales iguales a 0 -pv
-	signal(SIGINT, signal_handler);	
+	signal(SIGINT, signal_handler);
+	int animacion[2][8][8]={ {{0,0,0,0,0,0,0,0},
+			        {0,0,1,1,1,1,0,0},
+			        {0,1,1,1,1,1,1,0},
+			        {0,1,0,1,1,0,1,0},
+			        {0,1,1,1,1,1,1,0},
+			        {0,0,1,1,1,1,0,0},
+			        {0,0,1,1,1,1,0,0},
+		  	        {0,0,0,0,0,0,0,0}},
+	
+				{{0,0,1,1,1,1,0,0},
+			        {0,1,1,1,1,1,1,0},
+			        {0,1,0,1,1,0,1,0},
+			        {0,1,1,1,1,1,1,0},
+			        {0,0,1,0,0,1,0,0},
+			        {0,0,0,0,0,0,0,0},
+			        {0,0,0,1,1,0,0,0},
+		  	        {0,0,1,1,1,1,0,0}} };
+	
 	while (!signal_received) {
 		printf("presione Ctrl+c para terminar el programa");
-		for (row = 0; row < 8; row++) { //del 0 al 7
-			for (col = 0; col < 8; col++) { //del 0 al 7
-				if (frame_actual[row][col] == 1) {
-					encender_y_apagar_led(pines_positivos[row], pines_negativos[col]);
+		for (frame=0;frame<2;frame++){
+			for (row = 0; row < 8; row++) { //del 0 al 7
+				for (col = 0; col < 8; col++) { //del 0 al 7
+					if (animacion[frame][row][col] == 1) {
+						encender_y_apagar_led(pines_positivos[row], pines_negativos[col]);
+					}
 				}
 			}
 		}
 	}
-
 	// Fin
 	apagar_display();
 	gpioterminate();
 	return 1;
-
 }
 /*
 main() { // MAIN PRINCIPAL
