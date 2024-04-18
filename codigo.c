@@ -1,8 +1,11 @@
+#include <signal.h>
+#include <stdio.h>
+#include <pigpio.h>
 #define FRAMES 1
-#define TIME 0.01
+#define TIME 0.001
 
 // Variables globales
-volatile sig_atomic_c signal = 0;
+volatile sig_atomic_t signal_received = 0;
 
 // Pines
 const int pines_positivos[8]={26,19,13,6,5,11,9,10};
@@ -11,10 +14,10 @@ const int pines_negativos[8]={21,20,16,12,7,8,25,24};
 // Arreglo que contendrá el frame actual
 int frame_actual[8][8]={{0,0,0,0,0,0,0,0},
 		        {0,0,0,0,0,0,0,0},
-		        {0,0,0,0,0,0,0,0},
+		        {0,0,1,0,0,0,0,0},
 		        {0,0,0,1,1,0,0,0},
 		        {0,0,0,1,1,0,0,0},
-		        {0,0,0,0,0,0,0,0},
+		        {0,0,0,0,0,1,0,0},
 		        {0,0,0,0,0,0,0,0},
 	  	        {0,0,0,0,0,0,0,0}};
 
@@ -50,7 +53,7 @@ void encender_y_apagar_led(int signal_plus, int signal_minus) {  //recive direct
 		gpioSetMode(signal_plus,PI_OUTPUT);
 	//Activar Señales	
 		gpioWrite(signal_plus, PI_HIGH);  //levantamos señales
-		gpioWrite(signal_minus,PÏ_LOW); 
+		gpioWrite(signal_minus,PI_LOW); 
 	// Esperar
 		 time_sleep(TIME);
 	// Desactivar Señales
@@ -64,12 +67,12 @@ void encender_y_apagar_led(int signal_plus, int signal_minus) {  //recive direct
 
 void apagar_display(){ 
 	//modulo para asegurarse de apagar todos los led antes de ejecutar gpioTerminate
-	for(int i=0,i<8,i++){
-		if (gpioGetMode(pines_positivo[i]) == PI_HIGH){//preguntamos si estan activos -pv
+	for(int i=0;i<8;i++){
+		if (gpioGetMode(pines_positivos[i]) == PI_HIGH){//preguntamos si estan activos -pv
 			gpioWrite(pines_positivos[i],PI_LOW); //pines positivos a negativo
 			gpioSetMode(pines_positivos[i],PI_INPUT);
 		}
-		if(gpioGetMode(pines_negativos[i])) == PI_LOW){//preguntamos si estan activos -pv
+		if(gpioGetMode(pines_negativos[i]) == PI_LOW){//preguntamos si estan activos -pv
 			gpioWrite(pines_negativos[i],PI_HIGH); //pines negativos a positivo
 			gpioSetMode(pines_negativos[i],PI_INPUT);
 		}
@@ -78,7 +81,7 @@ void apagar_display(){
 	gpioTerminate();
 }
 
-void signal_handler(signal) { // FINALIZADA //
+void sigint_handler(int signal) { // FINALIZADA //
 	signal_received = signal;
 }
 /*(FLAVIO)Void Documento_de_Leds(){
@@ -94,19 +97,20 @@ void signal_handler(signal) { // FINALIZADA //
        }
        fclose(ledsfile);
   }     */
-main() { // MAIN DE PRUEBA: MANEJA UN SOLO FRAME (frame_actual) --- BORRAR POSTERIORMENTE
+int main() { // MAIN DE PRUEBA: MANEJA UN SOLO FRAME (frame_actual) --- BORRAR POSTERIORMENTE
 	int row, col;
 	/*(FLAVIO)FILE*ledsfile;
  	ledsfile=fopen("Leds.txt","w");
   	fclose(ledsfile);*/
-	if(gpioInitialize() == PI_INIT_FAILED){
+	if(gpioInitialise() == PI_INIT_FAILED){
 		printf("Error al inicializar el gpio\n");
 		return 1;
 	}
 	todos_led_off();//lo llamamos al inicio para asegurar que todo este reciviendo señales iguales a 0 -pv
-	signal(SIGINT, signal_handler);	
+	signal(SIGINT, sigint_handler);	
+	printf("presione Ctrl+c para terminar el programa");
 	while (!signal_received) {
-		printf("presione Ctrl+c para terminar el programa");
+		
 		for (row = 0; row < 8; row++) { //del 0 al 7
 			for (col = 0; col < 8; col++) { //del 0 al 7
 				if (frame_actual[row][col] == 1) {
@@ -118,7 +122,7 @@ main() { // MAIN DE PRUEBA: MANEJA UN SOLO FRAME (frame_actual) --- BORRAR POSTE
 
 	// Fin
 	apagar_display();
-	gpioterminate();
+	gpioTerminate();
 	return 1;
 
 }
