@@ -2,7 +2,7 @@
 #define TIME 0.01
 
 // Variables globales
-volatile sig_atomic_c signal = 0;
+volatile sig_atomic_c signal_received = 0;
 
 // Pines
 const int pines_positivos[8]={26,19,13,6,5,11,9,10};
