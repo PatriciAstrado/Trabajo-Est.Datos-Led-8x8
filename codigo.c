@@ -87,7 +87,7 @@ void apagar_display(){
 }
 void avanzar_frame(frame,duracion_frame){
 	duracion_frame=0//esto cortara el bucle dentro del frame actual
-	frame=(frame+1)%1 //avanza 1 frame sin sobrepasar del 1 (va de 0 a 1 ciclicamente)
+	frame=(frame+1)%2 //avanza 1 frame sin sobrepasar del 1 (va de 0 a 1 ciclicamente)
 }
 void signal_handler(signal) { // FINALIZADA //
 	signal_received = signal;
@@ -116,11 +116,11 @@ main() { // MAIN DE PRUEBA: MANEJA UN SOLO FRAME (frame_actual) --- BORRAR POSTE
 	}
 	todos_led_off();//lo llamamos al inicio para asegurar que todo este reciviendo señales iguales a 0 -pv
 	signal(SIGINT, signal_handler);	
+	printf("presione Ctrl+c para terminar el programa");
 	while (!signal_received) {
-		printf("presione Ctrl+c para terminar el programa");
 		duracion_frame=1
 		gpioSetTimerFunc(0,2000,avanzar_frame(frame,duracion_frame)) //empieza el temporizador 0 (maximo 9 simultaneos), por 2000 milisegundos
-		while(duracion_frame=1){                                     //cambia duracion_frame a 0 rompiedo el ciclo e incrementa frame en 1 (usando % para no sobrepasar)
+		while(duracion_frame==1){                                     //cambia duracion_frame a 0 rompiedo el ciclo e incrementa frame en 1 (usando % para no sobrepasar)
 			for (row = 0; row < 8; row++) {          //del 0 al 7
 				for (col = 0; col < 8; col++) {         //del 0 al 7
 					if (frame_actual[frame][row][col] == 1) {
