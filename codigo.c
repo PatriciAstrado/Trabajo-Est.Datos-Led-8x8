@@ -9,14 +9,22 @@ const int pines_positivos[8]={26,19,13,6,5,11,9,10};
 const int pines_negativos[8]={21,20,16,12,7,8,25,24};
 
 // Arreglo que contendrá el frame actual
-int frame_actual[8][8]={{0,0,0,0,0,0,0,0},
-		        {0,0,0,0,0,0,0,0},
-		        {0,0,0,0,0,0,0,0},
-		        {0,0,0,1,1,0,0,0},
-		        {0,0,0,1,1,0,0,0},
-		        {0,0,0,0,0,0,0,0},
-		        {0,0,0,0,0,0,0,0},
-	  	        {0,0,0,0,0,0,0,0}};
+int frame_actual[2][8][8]={{{0,0,0,0,0,0,0,0},
+		          {0,0,1,1,1,1,0,0},
+		          {0,1,1,1,1,1,1,0},
+		          {0,1,0,1,1,0,1,0},
+		          {0,1,1,1,1,1,1,0},
+		          {0,0,1,1,1,1,0,0},
+		          {0,0,1,1,1,1,0,0},
+	  	          {0,0,0,0,0,0,0,0}},
+			  {{0,0,1,1,1,1,0,0},
+		          {0,1,1,1,1,1,1,0},
+		          {0,1,0,1,1,0,1,0},
+		          {0,1,1,1,1,1,1,0},
+		          {0,0,1,0,0,1,0,0},
+		          {0,0,0,0,0,0,0,0},
+		          {0,0,0,1,1,0,0,0},
+	  	          {0,0,1,1,1,1,0,0}}};
 
 // Módulos
 void todos_led_off(){ //-pv
@@ -77,7 +85,10 @@ void apagar_display(){
 	}
 	gpioTerminate();
 }
-
+void avanzar_frame(frame,duracion_frame){
+	duracion_frame=0//esto cortara el bucle dentro del frame actual
+	frame=(frame+1)%2 //avanza 1 frame sin sobrepasar del 1 (va de 0 a 1 ciclicamente)
+}
 void signal_handler(signal) { // FINALIZADA //
 	signal_received = signal;
 }
@@ -95,7 +106,7 @@ void signal_handler(signal) { // FINALIZADA //
        fclose(ledsfile);
   }     */
 main() { // MAIN DE PRUEBA: MANEJA UN SOLO FRAME (frame_actual) --- BORRAR POSTERIORMENTE
-	int row, col;
+	int frame,row, col,duracion_frame;
 	/*(FLAVIO)FILE*ledsfile;
  	ledsfile=fopen("Leds.txt","w");
   	fclose(ledsfile);*/
@@ -105,12 +116,16 @@ main() { // MAIN DE PRUEBA: MANEJA UN SOLO FRAME (frame_actual) --- BORRAR POSTE
 	}
 	todos_led_off();//lo llamamos al inicio para asegurar que todo este reciviendo señales iguales a 0 -pv
 	signal(SIGINT, signal_handler);	
+	printf("presione Ctrl+c para terminar el programa");
 	while (!signal_received) {
-		printf("presione Ctrl+c para terminar el programa");
-		for (row = 0; row < 8; row++) { //del 0 al 7
-			for (col = 0; col < 8; col++) { //del 0 al 7
-				if (frame_actual[row][col] == 1) {
-					encender_y_apagar_led(pines_positivos[row], pines_negativos[col]);
+		duracion_frame=1
+		gpioSetTimerFunc(0,2000,avanzar_frame(frame,duracion_frame)) //empieza el temporizador 0 (maximo 9 simultaneos), por 2000 milisegundos
+		while(duracion_frame==1){                                     //cambia duracion_frame a 0 rompiedo el ciclo e incrementa frame en 1 (usando % para no sobrepasar)
+			for (row = 0; row < 8; row++) {          //del 0 al 7
+				for (col = 0; col < 8; col++) {         //del 0 al 7
+					if (frame_actual[frame][row][col] == 1) {
+						encender_y_apagar_led(pines_positivos[row], pines_negativos[col]);
+					}
 				}
 			}
 		}
@@ -124,7 +139,7 @@ main() { // MAIN DE PRUEBA: MANEJA UN SOLO FRAME (frame_actual) --- BORRAR POSTE
 }
 /*
 main() { // MAIN PRINCIPAL
-	int row,col;
+	int frame,row,col;
  	
 	if(gpioInitialize()==PI_INIT_FAILED){
 		printf("Error al inicializar el gpio\n");
