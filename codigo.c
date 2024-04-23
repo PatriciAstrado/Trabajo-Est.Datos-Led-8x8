@@ -74,7 +74,7 @@ void encender_y_apagar_led(int signal_plus, int signal_minus) {  //recive direct
 
 const void mostrar_frame(const int frame[8][8], const int DURACION) {
 	int mostrando_frame = 1;
-	gpioSetTimerFunc(0, DURACION * 10, avanzar_frame()) //empieza el temporizador 0 (maximo 9 simultaneos), por 2000 milisegundos (200 cs * 10 = 2000 ms)
+	gpioSetTimerFuncEx(0, DURACION * 10, avanzar_frame, &mostrando_frame); //empieza el temporizador 0 (maximo 9 simultaneos), por 2000 milisegundos (200 cs * 10 = 2000 ms)
 	
 	while (mostrando_frame == 1) { // cambiando mostrando_frame a 0 se rompe el ciclo e incrementa frame en 1 (usando % para no sobrepasar)
 		for (int row = 0; row < 8; row++) {          //del 0 al 7
@@ -103,8 +103,8 @@ void apagar_display(){
 	gpioTerminate();
 }
 
-void avanzar_frame(){
-	mostrando_frame=0;//esto cortara el bucle dentro del frame actual
+void avanzar_frame(void *mostrando_frame) {
+	*mostrando_frame = 0; //esto cortara el bucle dentro del frame actual
 	gpioSetTimerFunc(0, 2000, NULL);
 }
 
