@@ -89,7 +89,7 @@ const void mostrar_frame(const int frame[8][8], const int DURACION) {
 
 void apagar_display(){ 
 	//modulo para asegurarse de apagar todos los led antes de ejecutar gpioTerminate
-	for(int i = 0, i < 8, i++){
+	for(int i = 0, i < 8; i++){
 		if (gpioGetMode(pines_positivo[i]) == PI_HIGH){//preguntamos si estan activos -pv
 			gpioWrite(pines_positivos[i], PI_LOW); //pines positivos a negativo
 			gpioSetMode(pines_positivos[i], PI_INPUT);
