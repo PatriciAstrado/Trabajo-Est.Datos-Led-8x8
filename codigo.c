@@ -66,7 +66,7 @@ void encender_y_apagar_led(int signal_plus, int signal_minus) {  //recive direct
 		gpioWrite(signal_plus, PI_LOW);
 		gpioWrite(signal_minus, PI_HIGH);
 	 	time_sleep(TIME);
-		//(Flavio)Documento_de_Leds(frame_actual);
+		//Documento_de_Leds(frame_actual);
 	// Desactivar
 		gpioSetMode(signal_minus, PI_INPUT); //que ejecute la señales
 		gpioSetMode(signal_plus, PI_INPUT);
@@ -112,14 +112,14 @@ const void signal_handler(int signal) {
 	signal_received = signal;
 }
 
-/*(FLAVIO)void Documento_de_Leds(int frame_actual[2][8][8]){
+/*void Documento_de_Leds(int frame_actual[2][8][8]){
 	FILE*ledsfile=fopen("Leds.txt","a");
  	if(ledsfile==NULL){
   		printf("No se puedo abrir el archivo");
     	}
     for(int frame=0;frame<2;frame++){
-   		for(row=0;row<8;row++){
-   			for(col=0;col<8;col++){
+   		for(int row=0;row<8;row++){
+   			for(int col=0;col<8;col++){
 				fprintf(ledsfile,"%d,",frame_actual[frame][row][col]);
    			}
      		fprintf(ledsfile,"\n");
@@ -132,7 +132,7 @@ const void signal_handler(int signal) {
 
 int main() {
 	int frame;
-	/*(FLAVIO)FILE*ledsfile;
+	/*FILE*ledsfile;
  	ledsfile=fopen("Leds.txt","w");
   	fclose(ledsfile);*/
 
