@@ -26,6 +26,7 @@ int frame_actual[2][8][8] = {{{0,0,0,0,0,0,0,0},
 		              {0,0,0,0,0,0,0,0},
 		              {0,0,0,1,1,0,0,0},
 	  	              {0,0,1,1,1,1,0,0}}};
+int mostrando_frame; //usado como booleano para indicar cuando terminar de mostrar un frame
 
 // Módulos
 void todos_led_off(){ //-pv
@@ -72,10 +73,10 @@ void encender_y_apagar_led(int signal_plus, int signal_minus) {  //recive direct
 }
 
 const void mostrar_frame(const int frame[8][8], const int DURACION) {
-	int duracion_frame = 1;
-	gpioSetTimerFunc(0, DURACION * 10, avanzar_frame(frame, duracion_frame)) //empieza el temporizador 0 (maximo 9 simultaneos), por 2000 milisegundos (200 cs * 10 = 2000 ms)
+	int mostrando_frame = 1;
+	gpioSetTimerFunc(0, DURACION * 10, avanzar_frame()) //empieza el temporizador 0 (maximo 9 simultaneos), por 2000 milisegundos (200 cs * 10 = 2000 ms)
 	
-	while (duracion_frame == 1) { // cambia duracion_frame a 0 rompiedo el ciclo e incrementa frame en 1 (usando % para no sobrepasar)
+	while (mostrando_frame == 1) { // cambiando mostrando_frame a 0 se rompe el ciclo e incrementa frame en 1 (usando % para no sobrepasar)
 		for (int row = 0; row < 8; row++) {          //del 0 al 7
 			for (int col = 0; col < 8; col++) {         //del 0 al 7
 				if (frame[row][col] == 1) {
@@ -102,9 +103,9 @@ void apagar_display(){
 	gpioTerminate();
 }
 
-void avanzar_frame(frame,duracion_frame){
-	duracion_frame=0//esto cortara el bucle dentro del frame actual
-	frame=(frame+1)%2 //avanza 1 frame sin sobrepasar del 1 (va de 0 a 1 ciclicamente)
+void avanzar_frame(){
+	mostrando_frame=0;//esto cortara el bucle dentro del frame actual
+	gpioSetTimerFunc(0, 2000, NULL);
 }
 
 const void signal_handler(int signal) {
@@ -147,6 +148,7 @@ int main() {
 	
 	while (!signal_received) {
 		mostrar_frame(frame_actual[frame], DURACION);
+		frame=(frame+1)%2;
 	}
 
 	// Fin
