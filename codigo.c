@@ -1,13 +1,17 @@
 #define FRAMES 1
-#define TIME 0.01
-
+#define TIME 0.0001
+#include <stdio.h>
+#include <signal.h>
+#include <pigpio.h>
+#include <time.h>
 // Espacio de nombres global
-volatile sig_atomic_c signal_received = 0;
-const int DURACION = 200; // En centésimas de segundo
+volatile sig_atomic_t signal_received = 0;
+const int DURACION = 30; // En centésimas de segundo
 
 // Pines
 const int pines_positivos[8] = {26, 19, 13, 6, 5, 11, 9, 10};
 const int pines_negativos[8] = {21, 20, 16, 12, 7, 8, 25, 24};
+int mostrando_frame;//usado como booleano para indicar cuando terminar de mostrar un frame
 
 // Arreglo que contendrá el frame actual
 int frame_actual[2][8][8] = {{{0,0,0,0,0,0,0,0},
@@ -26,7 +30,7 @@ int frame_actual[2][8][8] = {{{0,0,0,0,0,0,0,0},
 		              {0,0,0,0,0,0,0,0},
 		              {0,0,0,1,1,0,0,0},
 	  	              {0,0,1,1,1,1,0,0}}};
-int mostrando_frame; //usado como booleano para indicar cuando terminar de mostrar un frame
+
 
 // Módulos
 void todos_led_off(){ //-pv
@@ -65,18 +69,23 @@ void encender_y_apagar_led(int signal_plus, int signal_minus) {  //recive direct
 	// Desactivar Señales
 		gpioWrite(signal_plus, PI_LOW);
 		gpioWrite(signal_minus, PI_HIGH);
-	 	time_sleep(TIME);
+	 	//time_sleep(TIME);
 		//Documento_de_Leds(frame_actual);
 	// Desactivar
 		gpioSetMode(signal_minus, PI_INPUT); //que ejecute la señales
 		gpioSetMode(signal_plus, PI_INPUT);
 }
 
+void avanzar_frame() {
+	mostrando_frame = 0; //esto cortara el bucle dentro del frame actual
+	gpioSetTimerFunc(0, 2000, NULL);
+}
+
 const void mostrar_frame(const int frame[8][8], const int DURACION) {
-	int mostrando_frame = 1;
-	gpioSetTimerFuncEx(0, DURACION * 10, avanzar_frame, &mostrando_frame); //empieza el temporizador 0 (maximo 9 simultaneos), por 2000 milisegundos (200 cs * 10 = 2000 ms)
+	mostrando_frame = 1;
+	gpioSetTimerFunc(0, DURACION * 10, avanzar_frame); //empieza el temporizador 0 (maximo 9 simultaneos), por 2000 milisegundos (200 cs * 10 = 2000 ms)
 	
-	while (mostrando_frame == 1) { // cambiando mostrando_frame a 0 se rompe el ciclo e incrementa frame en 1 (usando % para no sobrepasar)
+	while ((mostrando_frame == 1) && !signal_received) { // cambiando mostrando_frame a 0 se rompe el ciclo e incrementa frame en 1 (usando % para no sobrepasar)
 		for (int row = 0; row < 8; row++) {          //del 0 al 7
 			for (int col = 0; col < 8; col++) {         //del 0 al 7
 				if (frame[row][col] == 1) {
@@ -89,12 +98,12 @@ const void mostrar_frame(const int frame[8][8], const int DURACION) {
 
 void apagar_display(){ 
 	//modulo para asegurarse de apagar todos los led antes de ejecutar gpioTerminate
-	for(int i = 0, i < 8; i++){
-		if (gpioGetMode(pines_positivo[i]) == PI_HIGH){//preguntamos si estan activos -pv
+	for(int i = 0; i < 8; i++){
+		if (gpioGetMode(pines_positivos[i]) == PI_HIGH){//preguntamos si estan activos -pv
 			gpioWrite(pines_positivos[i], PI_LOW); //pines positivos a negativo
 			gpioSetMode(pines_positivos[i], PI_INPUT);
 		}
-		if(gpioGetMode(pines_negativos[i])) == PI_LOW){//preguntamos si estan activos -pv
+		if((gpioGetMode(pines_negativos[i])) == PI_LOW){//preguntamos si estan activos -pv
 			gpioWrite(pines_negativos[i], PI_HIGH); //pines negativos a positivo
 			gpioSetMode(pines_negativos[i], PI_INPUT);
 		}
@@ -103,10 +112,7 @@ void apagar_display(){
 	gpioTerminate();
 }
 
-void avanzar_frame(void *mostrando_frame) {
-	*mostrando_frame = 0; //esto cortara el bucle dentro del frame actual
-	gpioSetTimerFunc(0, 2000, NULL);
-}
+
 
 const void signal_handler(int signal) {
 	signal_received = signal;
@@ -137,7 +143,7 @@ int main() {
   	fclose(ledsfile);*/
 
 	// Inicio
-	if(gpioInitialize() == PI_INIT_FAILED){ // Inicialización del GPIO
+	if(gpioInitialise() == PI_INIT_FAILED){ // Inicialización del GPIO
 		printf("Error al inicializar el GPIO.\n");
 		return 1;
 	}
